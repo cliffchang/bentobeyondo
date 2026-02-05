@@ -2,6 +2,7 @@ interface GameStatsProps {
   customersServed: number
   customersAngry: number
   totalPayment: number
+  perfectStreak: number
   isEndScreen?: boolean
   onRestart?: () => void
 }
@@ -10,6 +11,7 @@ export function GameStats({
   customersServed,
   customersAngry,
   totalPayment,
+  perfectStreak,
   isEndScreen = false,
   onRestart,
 }: GameStatsProps) {
@@ -52,6 +54,11 @@ export function GameStats({
       <span className="stat-item">
         Payment: <strong>${totalPayment}</strong>
       </span>
+      {perfectStreak > 0 && (
+        <span className="stat-item streak">
+          Streak: <strong>{perfectStreak}</strong>
+        </span>
+      )}
     </div>
   )
 }

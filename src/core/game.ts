@@ -1,4 +1,4 @@
-import { GameState, Customer, Position, Rotation, Scoop } from './types'
+import { GameState, Customer, Rotation } from './types'
 import { createStartingBag, drawInitialScoops, drawScoop, createRefillBag } from './bag'
 import { createRandomBento } from '../data/bentos'
 import { placeScoop, isBentoFull, canPlace } from './placement'
@@ -37,6 +37,7 @@ function createCustomer(): Customer {
     patience,
     maxPatience: patience,
     bento,
+    scoopsUsed: 0,
   }
 }
 
@@ -65,6 +66,9 @@ export function createInitialState(): GameState {
     customersAngry: 0,
     totalPayment: 0,
     phase: 'playing',
+    lastServedEvent: null,
+    perfectStreak: 0,
+    maxPerfectBonusPercent: 30,
   }
 }
 
@@ -161,31 +165,66 @@ function advanceScoop(state: GameState): GameState {
 }
 
 /**
+ * Calculate streak bonus multiplier (e.g., streak 2 with max 30% = 1.2)
+ */
+function calculateStreakBonus(streak: number, maxBonusPercent: number): number {
+  const bonusPercent = Math.min(streak * 10, maxBonusPercent)
+  return 1 + bonusPercent / 100
+}
+
+/**
  * Check and handle customer completion/anger
  */
 function processCustomers(state: GameState): GameState {
-  let newState = { ...state }
+  let newState: GameState = { ...state, lastServedEvent: null }
   const customersToRemove: number[] = []
   let newCustomersServed = state.customersServed
   let newCustomersAngry = state.customersAngry
   let newPayment = state.totalPayment
+  let newPerfectStreak = state.perfectStreak
+
+  // Track serve results for streak calculation
+  let servedImperfect = false
+  let customerAngry = false
 
   // Check each customer
   newState.customers.forEach((customer, index) => {
     // Check if bento is full (served)
     if (isBentoFull(customer.bento)) {
       const fillPercentage = calculateFillPercentage(customer.bento)
-      const payment = calculatePayment(fillPercentage)
+      let payment = calculatePayment(fillPercentage)
+      const minScoops = Math.ceil(customer.bento.size / AVG_SCOOP_SIZE)
+      const isPerfect = customer.scoopsUsed <= minScoops
+
+      if (isPerfect) {
+        // Increment streak first, then calculate bonus
+        newPerfectStreak = state.perfectStreak + 1
+        const bonusMultiplier = calculateStreakBonus(newPerfectStreak, state.maxPerfectBonusPercent)
+        payment = Math.round(payment * bonusMultiplier)
+      } else {
+        servedImperfect = true
+      }
+
       newCustomersServed++
       newPayment += payment
       customersToRemove.push(index)
+      // Record served event for animation (include streak at time of serve)
+      newState.lastServedEvent = { slotIndex: index, payment, isPerfect, perfectStreak: isPerfect ? newPerfectStreak : 0 }
     }
     // Check if patience depleted (angry)
     else if (customer.patience <= 0) {
       newCustomersAngry++
       customersToRemove.push(index)
+      customerAngry = true
     }
   })
+
+  // Update streak based on what happened this turn
+  // Angry customer or imperfect serve breaks the streak
+  if (customerAngry || servedImperfect) {
+    newPerfectStreak = 0
+  }
+  // If only perfect serve (no angry), streak was already incremented above
 
   // Check if game should end
   const totalProcessed = newCustomersServed + newCustomersAngry
@@ -215,6 +254,7 @@ function processCustomers(state: GameState): GameState {
     customersServed: newCustomersServed,
     customersAngry: newCustomersAngry,
     totalPayment: newPayment,
+    perfectStreak: newPerfectStreak,
   }
 
   if (gameEnding) {
@@ -274,11 +314,13 @@ export function placeCurrentScoop(state: GameState): GameState {
     state.cursor.position
   )
 
-  // Update customer's bento
+  // Update customer's bento and increment scoops used
   let newState: GameState = {
     ...state,
     customers: state.customers.map((c, i) =>
-      i === state.cursor.bentoIndex ? { ...c, bento: newBento } : c
+      i === state.cursor.bentoIndex
+        ? { ...c, bento: newBento, scoopsUsed: c.scoopsUsed + 1 }
+        : c
     ),
     turn: state.turn + 1,
   }
@@ -316,4 +358,11 @@ export function discardCurrentScoop(state: GameState): GameState {
   newState = processCustomers(newState)
 
   return newState
+}
+
+/**
+ * Clear the last served event (after animation completes)
+ */
+export function clearServedEvent(state: GameState): GameState {
+  return { ...state, lastServedEvent: null }
 }

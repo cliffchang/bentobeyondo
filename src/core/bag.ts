@@ -36,7 +36,7 @@ export function createStartingBag(): Scoop[] {
 
   // Create 10 scoops with varied shapes and ingredients
   for (let i = 0; i < 10; i++) {
-    const [shapeName, shape] = shapes[i % shapes.length]
+    const [, shape] = shapes[i % shapes.length]
     const ingredient = ingredients[i % ingredients.length]
     scoops.push(createScoop(`scoop-${scoopId++}`, shape, ingredient))
   }

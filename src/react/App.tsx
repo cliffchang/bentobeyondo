@@ -2,11 +2,11 @@ import { useGame } from './hooks/useGame'
 import { Counter } from './components/Counter'
 
 function App() {
-  const { state, restart } = useGame()
+  const { state, dispatch, restart } = useGame()
 
   return (
     <div className="app">
-      <Counter state={state} onRestart={restart} />
+      <Counter state={state} dispatch={dispatch} onRestart={restart} />
     </div>
   )
 }

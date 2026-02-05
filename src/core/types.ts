@@ -31,6 +31,7 @@ export interface Customer {
   patience: number
   maxPatience: number
   bento: BentoGrid
+  scoopsUsed: number
 }
 
 export interface Position {
@@ -39,6 +40,13 @@ export interface Position {
 }
 
 export type Rotation = 0 | 1 | 2 | 3  // 0°, 90°, 180°, 270°
+
+export interface ServedEvent {
+  slotIndex: number
+  payment: number
+  isPerfect: boolean
+  perfectStreak: number  // Streak count at time of serve (for displaying bonus)
+}
 
 export interface GameState {
   customers: Customer[]           // Active customers (2 for MVP)
@@ -52,6 +60,9 @@ export interface GameState {
   customersAngry: number
   totalPayment: number
   phase: 'playing' | 'ended'
+  lastServedEvent: ServedEvent | null
+  perfectStreak: number           // Current consecutive perfect serves
+  maxPerfectBonusPercent: number  // Max streak bonus (default 30%, upgradeable)
 }
 
 export type GameAction =
@@ -60,3 +71,4 @@ export type GameAction =
   | { type: 'PLACE' }
   | { type: 'DISCARD' }
   | { type: 'RESTART' }
+  | { type: 'CLEAR_SERVED_EVENT' }

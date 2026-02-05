@@ -6,6 +6,7 @@ import {
   rotateScoop,
   placeCurrentScoop,
   discardCurrentScoop,
+  clearServedEvent,
 } from '../../core/game'
 
 function gameReducer(state: GameState, action: GameAction): GameState {
@@ -20,6 +21,8 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return discardCurrentScoop(state)
     case 'RESTART':
       return createInitialState()
+    case 'CLEAR_SERVED_EVENT':
+      return clearServedEvent(state)
     default:
       return state
   }

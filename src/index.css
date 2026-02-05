@@ -107,6 +107,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  position: relative;
 }
 
 /* Customer Info */
@@ -389,6 +390,64 @@ body {
   border-radius: 8px;
   font-size: 0.875rem;
   color: var(--text-secondary);
+}
+
+/* Served Animation */
+.served-animation {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  animation: slide-up 1.5s ease-out forwards;
+}
+
+.served-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.served-text .perfect {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fbbf24;
+  animation: pulse 0.3s ease-out;
+}
+
+.served-text .payment {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--success);
+}
+
+@keyframes slide-up {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Responsive */

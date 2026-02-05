@@ -1,4 +1,5 @@
-import { GameState } from '../../core/types'
+import { useEffect } from 'react'
+import { GameState, GameAction } from '../../core/types'
 import { getRotatedShape } from '../../core/polyomino'
 import { BentoBox } from './BentoBox'
 import { ScoopPreview } from './ScoopPreview'
@@ -7,10 +8,20 @@ import { GameStats } from './GameStats'
 
 interface CounterProps {
   state: GameState
+  dispatch: React.Dispatch<GameAction>
   onRestart: () => void
 }
 
-export function Counter({ state, onRestart }: CounterProps) {
+export function Counter({ state, dispatch, onRestart }: CounterProps) {
+  // Clear served event after animation
+  useEffect(() => {
+    if (state.lastServedEvent) {
+      const timer = setTimeout(() => {
+        dispatch({ type: 'CLEAR_SERVED_EVENT' })
+      }, 1500)
+      return () => clearTimeout(timer)
+    }
+  }, [state.lastServedEvent, dispatch])
   if (state.phase === 'ended') {
     return (
       <div className="counter ended">
@@ -18,6 +29,7 @@ export function Counter({ state, onRestart }: CounterProps) {
           customersServed={state.customersServed}
           customersAngry={state.customersAngry}
           totalPayment={state.totalPayment}
+          perfectStreak={state.perfectStreak}
           isEndScreen={true}
           onRestart={onRestart}
         />
@@ -37,6 +49,7 @@ export function Counter({ state, onRestart }: CounterProps) {
           customersServed={state.customersServed}
           customersAngry={state.customersAngry}
           totalPayment={state.totalPayment}
+          perfectStreak={state.perfectStreak}
         />
       </div>
 
@@ -60,6 +73,21 @@ export function Counter({ state, onRestart }: CounterProps) {
                   state.cursor.bentoIndex === index ? currentShape : null
                 }
               />
+              {state.lastServedEvent?.slotIndex === index && (
+                <div className="served-animation">
+                  <div className="served-text">
+                    {state.lastServedEvent.isPerfect && (
+                      <span className="perfect">
+                        Perfecto!
+                        {state.lastServedEvent.perfectStreak > 1 && (
+                          <span className="streak"> x{state.lastServedEvent.perfectStreak}</span>
+                        )}
+                      </span>
+                    )}
+                    <span className="payment">+${state.lastServedEvent.payment}</span>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -76,11 +104,10 @@ export function Counter({ state, onRestart }: CounterProps) {
       </div>
 
       <div className="controls-help">
-        <span>Arrow keys: Move</span>
+        <span>Arrow keys: Move/Switch</span>
         <span>R: Rotate</span>
         <span>Space/Enter: Place</span>
         <span>Tab: Discard</span>
-        <span>Q: Switch bento</span>
       </div>
     </div>
   )
