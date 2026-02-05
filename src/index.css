@@ -1,0 +1,416 @@
+:root {
+  --cell-size: 48px;
+  --gap: 2px;
+
+  /* Colors */
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --bg-card: #0f3460;
+
+  --text-primary: #eaeaea;
+  --text-secondary: #94a3b8;
+
+  --cell-empty: #2d3a4f;
+  --cell-filled: #4ade80;
+  --cell-blocked: #374151;
+  --cell-ghost: rgba(74, 222, 128, 0.4);
+  --cell-wasted: rgba(239, 68, 68, 0.5);
+
+  --ingredient-rice: #fef3c7;
+  --ingredient-protein: #fca5a5;
+  --ingredient-vegetable: #86efac;
+
+  --patience-full: #4ade80;
+  --patience-urgent: #fbbf24;
+  --patience-critical: #ef4444;
+
+  --active-border: #3b82f6;
+  --danger: #ef4444;
+  --success: #4ade80;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#root {
+  width: 100%;
+  max-width: 900px;
+  padding: 20px;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Counter Layout */
+.counter {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.counter.ended {
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.counter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.counter-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.counter-main {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.bentos-area {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.scoops-area {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Customer Station */
+.customer-station {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Customer Info */
+.customer-info {
+  background: var(--bg-card);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.customer-info.active {
+  border-color: var(--active-border);
+}
+
+.customer-name {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.patience-container {
+  position: relative;
+  height: 20px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.patience-bar {
+  height: 100%;
+  background: var(--patience-full);
+  transition: width 0.3s ease, background-color 0.3s;
+}
+
+.patience-bar.urgent {
+  background: var(--patience-urgent);
+}
+
+.patience-bar.critical {
+  background: var(--patience-critical);
+  animation: pulse 0.5s infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 1; }
+  to { opacity: 0.6; }
+}
+
+.patience-text {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Bento Box */
+.bento-box {
+  position: relative;
+  background: var(--bg-card);
+  padding: 16px;
+  border-radius: 12px;
+  border: 3px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.bento-box.active {
+  border-color: var(--active-border);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.bento-grid {
+  display: grid;
+  gap: var(--gap);
+}
+
+.bento-cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.bento-cell.empty {
+  background: var(--cell-empty);
+}
+
+.bento-cell.filled {
+  background: var(--cell-filled);
+}
+
+.bento-cell.blocked {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--cell-blocked),
+    var(--cell-blocked) 4px,
+    #1f2937 4px,
+    #1f2937 8px
+  );
+  opacity: 0.6;
+}
+
+.bento-cell.ghost {
+  background: var(--cell-ghost);
+  border: 2px dashed var(--cell-filled);
+}
+
+.bento-cell.ghost.wasted {
+  background: var(--cell-wasted);
+  border-color: var(--danger);
+}
+
+.ghost-cell-outside {
+  position: absolute;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  border-radius: 6px;
+  background: var(--cell-wasted);
+  border: 2px dashed var(--danger);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Scoop Preview */
+.scoop-preview {
+  background: var(--bg-card);
+  padding: 16px;
+  border-radius: 8px;
+  min-width: 120px;
+}
+
+.scoop-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}
+
+.scoop-empty {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.scoop-shape {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scoop-row {
+  display: flex;
+  gap: 2px;
+}
+
+.scoop-cell {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+}
+
+.scoop-cell.empty {
+  background: transparent;
+}
+
+.scoop-cell.filled {
+  background: var(--cell-filled);
+}
+
+.ingredient-rice .scoop-cell.filled {
+  background: var(--ingredient-rice);
+}
+
+.ingredient-protein .scoop-cell.filled {
+  background: var(--ingredient-protein);
+}
+
+.ingredient-vegetable .scoop-cell.filled {
+  background: var(--ingredient-vegetable);
+}
+
+.rotation-indicator {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Game Stats */
+.game-stats.inline {
+  display: flex;
+  gap: 16px;
+  font-size: 0.9rem;
+}
+
+.stat-item {
+  color: var(--text-secondary);
+}
+
+.stat-item strong {
+  color: var(--text-primary);
+}
+
+.stat-item .danger {
+  color: var(--danger);
+}
+
+/* End Screen */
+.game-stats.end-screen {
+  background: var(--bg-card);
+  padding: 40px;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.game-stats.end-screen h2 {
+  font-size: 2rem;
+  margin-bottom: 24px;
+}
+
+.stats-grid {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.stat-value.success {
+  color: var(--success);
+}
+
+.stat-value.danger {
+  color: var(--danger);
+}
+
+.restart-hint {
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.restart-button {
+  background: var(--active-border);
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.restart-button:hover {
+  background: #2563eb;
+}
+
+/* Controls Help */
+.controls-help {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  :root {
+    --cell-size: 36px;
+  }
+
+  .counter-main {
+    flex-direction: column;
+  }
+
+  .bentos-area {
+    flex-direction: column;
+  }
+
+  .scoops-area {
+    flex-direction: row;
+  }
+
+  .stats-grid {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
