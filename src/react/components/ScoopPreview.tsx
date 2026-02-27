@@ -29,8 +29,13 @@ export function ScoopPreview({
 
   return (
     <div className="scoop-preview">
-      <div className="scoop-label">{label}</div>
-      <div className={`scoop-shape ingredient-${scoop.ingredient}`}>
+      <div className="scoop-label">
+        {label}
+        {scoop.ingredient && (
+          <span className="ingredient-emoji">{scoop.ingredient.emoji}</span>
+        )}
+      </div>
+      <div className="scoop-shape">
         {shape.map((row, r) => (
           <div key={r} className="scoop-row">
             {row.map((cell, c) => (

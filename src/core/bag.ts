@@ -1,4 +1,4 @@
-import { Scoop, IngredientType, Shape } from './types'
+import { Scoop } from './types'
 import { TETROMINOES } from '../data/shapes'
 
 /**
@@ -14,42 +14,33 @@ export function shuffleBag<T>(array: T[]): T[] {
 }
 
 /**
- * Create a single scoop from a shape
+ * Create the starting deck: 2 of each tetromino (14 plain scoops)
  */
-function createScoop(
-  id: string,
-  shape: Shape,
-  ingredient: IngredientType
-): Scoop {
-  return { id, shape, ingredient }
-}
-
-/**
- * Create starting bag with 10 scoops of mixed shapes and ingredients
- */
-export function createStartingBag(): Scoop[] {
+export function createStartingDeck(): { deck: Scoop[]; nextDeckId: number } {
   const shapes = Object.entries(TETROMINOES)
-  const ingredients: IngredientType[] = ['rice', 'protein', 'vegetable']
+  const deck: Scoop[] = []
+  let id = 0
 
-  const scoops: Scoop[] = []
-  let scoopId = 0
-
-  // Create 10 scoops with varied shapes and ingredients
-  for (let i = 0; i < 10; i++) {
-    const [, shape] = shapes[i % shapes.length]
-    const ingredient = ingredients[i % ingredients.length]
-    scoops.push(createScoop(`scoop-${scoopId++}`, shape, ingredient))
+  for (const [shapeName, shape] of shapes) {
+    for (let copy = 0; copy < 2; copy++) {
+      deck.push({
+        id: `deck-${id}`,
+        shape,
+        shapeName,
+        ingredient: null,
+      })
+      id++
+    }
   }
 
-  return shuffleBag(scoops)
+  return { deck, nextDeckId: id }
 }
 
 /**
- * Create a refill bag when current bag is empty
- * This ensures the game can continue
+ * Create a bag by shuffling a copy of the deck
  */
-export function createRefillBag(): Scoop[] {
-  return createStartingBag()
+export function createBagFromDeck(deck: Scoop[]): Scoop[] {
+  return shuffleBag([...deck])
 }
 
 /**

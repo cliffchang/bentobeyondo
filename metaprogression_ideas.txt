@@ -1,0 +1,7 @@
+Player powers:
+ - See more scoops in advance, or swap them.
+ - Matching a scoop on a bento gives +1 patience to that customer.
+
+Scoop upgrades:
+ - The ability to flip the scoop
+ - Add a premium ingredient to the scoop

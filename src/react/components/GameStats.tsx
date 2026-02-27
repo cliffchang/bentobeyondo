@@ -1,58 +1,31 @@
 interface GameStatsProps {
-  customersServed: number
-  customersAngry: number
-  totalPayment: number
+  day: number
+  dayPayment: number
+  totalMoney: number
   perfectStreak: number
-  isEndScreen?: boolean
-  onRestart?: () => void
+  rating: number | null
 }
 
 export function GameStats({
-  customersServed,
-  customersAngry,
-  totalPayment,
+  day,
+  dayPayment,
+  totalMoney,
   perfectStreak,
-  isEndScreen = false,
-  onRestart,
+  rating,
 }: GameStatsProps) {
-  if (isEndScreen) {
-    return (
-      <div className="game-stats end-screen">
-        <h2>Service Complete!</h2>
-        <div className="stats-grid">
-          <div className="stat">
-            <span className="stat-label">Customers Served</span>
-            <span className="stat-value success">{customersServed}</span>
-          </div>
-          <div className="stat">
-            <span className="stat-label">Customers Angry</span>
-            <span className="stat-value danger">{customersAngry}</span>
-          </div>
-          <div className="stat">
-            <span className="stat-label">Total Payment</span>
-            <span className="stat-value">${totalPayment}</span>
-          </div>
-        </div>
-        <p className="restart-hint">Press Space or Enter to play again</p>
-        {onRestart && (
-          <button className="restart-button" onClick={onRestart}>
-            Play Again
-          </button>
-        )}
-      </div>
-    )
-  }
-
   return (
     <div className="game-stats inline">
       <span className="stat-item">
-        Served: <strong>{customersServed}</strong>
+        Day: <strong>{day}</strong>
       </span>
       <span className="stat-item">
-        Angry: <strong className="danger">{customersAngry}</strong>
+        Today: <strong className="success">${dayPayment}</strong>
       </span>
       <span className="stat-item">
-        Payment: <strong>${totalPayment}</strong>
+        Savings: <strong>${totalMoney}</strong>
+      </span>
+      <span className="stat-item rating">
+        <strong className="stars">{rating !== null ? `★ ${rating.toFixed(1)}` : '★ —'}</strong>
       </span>
       {perfectStreak > 0 && (
         <span className="stat-item streak">

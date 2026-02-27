@@ -34,18 +34,44 @@ export function calculatePayment(fillPercentage: number): number {
 }
 
 /**
+ * Calculate review stars for a served customer
+ * Fill ≤ 50%: 1 star (cliff)
+ * Fill > 50%: scales from 1.0 to 3.5
+ * +0.5 for PERFECTO, +0.5 for DELICIOSO, +1.5 for both
+ *   (so technically 4.5* is not possible)
+ */
+export function calculateReviewStars(
+  fillPercentage: number,
+  isPerfect: boolean,
+  isDelicioso: boolean
+): number {
+  let stars: number
+  if (fillPercentage <= 50) {
+    stars = 1.0
+  } else {
+    stars = 1.0 + ((fillPercentage - 50) / 50) * 2.5
+  }
+
+  if (isPerfect) stars += 0.5
+  if (isDelicioso) stars += 0.5
+  if (isPerfect && isDelicioso) stars += 0.5
+
+  return Math.min(5.0, Math.round(stars * 10) / 10)
+}
+
+/**
  * Calculate stats for end-game display
  */
 export interface GameStats {
   customersServed: number
-  customersAngry: number
+  patienceExpired: number
   totalPayment: number
   averageFillPercentage: number
 }
 
 export function calculateGameStats(
   customersServed: number,
-  customersAngry: number,
+  patienceExpired: number,
   totalPayment: number,
   fillPercentages: number[]
 ): GameStats {
@@ -56,7 +82,7 @@ export function calculateGameStats(
 
   return {
     customersServed,
-    customersAngry,
+    patienceExpired,
     totalPayment,
     averageFillPercentage: Math.round(averageFillPercentage * 10) / 10,
   }
